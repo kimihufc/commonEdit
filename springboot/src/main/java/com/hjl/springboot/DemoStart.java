@@ -1,5 +1,6 @@
 package com.hjl.springboot;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
@@ -8,6 +9,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  * @create: 2018-12-18 17:03
  */
 @SpringBootApplication
+@MapperScan("com.hjl.springboot.dao")
 public class DemoStart {
 
     public static void main(String[] args) {
