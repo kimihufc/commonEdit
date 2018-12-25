@@ -1,8 +1,8 @@
 package com.hjl.springboot;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * @author: HJL
