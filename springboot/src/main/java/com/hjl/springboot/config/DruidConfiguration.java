@@ -1,5 +1,6 @@
 package com.hjl.springboot.config;
 
+import com.alibaba.druid.filter.stat.MergeStatFilter;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
 import org.slf4j.Logger;
@@ -48,4 +49,11 @@ public class DruidConfiguration {
         return filterRegistrationBean;
     }
 
+    @Bean
+    public MergeStatFilter creatFilter(){
+        MergeStatFilter fiter = new MergeStatFilter();
+        fiter.setSlowSqlMillis(100L);
+        fiter.setLogSlowSql(true);
+        return fiter;
+    }
 }
