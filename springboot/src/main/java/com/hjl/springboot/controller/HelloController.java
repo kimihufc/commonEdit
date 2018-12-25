@@ -1,6 +1,10 @@
 package com.hjl.springboot.controller;
 
+import com.hjl.springboot.config.RedisAccess;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -10,9 +14,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
+    @Autowired
+    private RedisAccess redisAccess;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @GetMapping("hello")
-    public String hello(){
+    public String hello() {
         return "hello";
+    }
+
+    @RequestMapping(value = "redis")
+    public String testRedis() {
+        redisTemplate.opsForValue().set("name", "hello");
+        return redisTemplate.opsForValue().get("name").toString();
+    }
+
+    @RequestMapping(value = "redisSet")
+    public void setRedis(String key,String val){
+        redisAccess.setNx(key,val,60L);
+    }
+
+    @GetMapping(value = "redisGet")
+    public String getRedis(String key){
+        String result = redisAccess.get(key);
+        return result;
     }
 
 }
