@@ -1,15 +1,19 @@
 package com.hjl.springboot.config;
 
 import com.alibaba.druid.filter.stat.MergeStatFilter;
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.sql.DataSource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +27,22 @@ import java.util.Map;
 public class DruidConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(DruidConfiguration.class);
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
+    @Value("${spring.datasource.username}")
+    private String jdbcUser;
+    @Value("${spring.datasource.password}")
+    private String jdbcPass;
+    @Value("${spring.datasource.initialSize}")
+    private String jdbcInitSizs;
+    @Value("${spring.datasource.minIdle}")
+    private String jdbcMinidle;
+    @Value("${spring.datasource.maxActive}")
+    private String jdbcActive;
+    @Value("${spring.datasource.maxWait}")
+    private String jdbcMaxwait;
+    @Value("${spring.datasource.validationQuery}")
+    private String jdbcQuery;
 
     @Bean
     public ServletRegistrationBean druidServlet() {
@@ -55,5 +75,32 @@ public class DruidConfiguration {
         fiter.setSlowSqlMillis(10L);
         fiter.setLogSlowSql(true);
         return fiter;
+    }
+
+    @Bean
+    public DataSource createDataSource(){
+        DruidDataSource dataSource = new DruidDataSource();
+        // mysql 驱动
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        // url
+        dataSource.setUrl(jdbcUrl);
+        // 账号
+        dataSource.setUsername(jdbcUser);
+        // 密码
+        dataSource.setPassword(jdbcPass);
+        // 初始化连接
+        dataSource.setInitialSize(Integer.parseInt(jdbcInitSizs));
+        // 最大线程数
+        dataSource.setMaxActive(Integer.parseInt(jdbcActive));
+        // 空闲时, 最大保留连接数
+        dataSource.setMinIdle(Integer.parseInt(jdbcMinidle));
+        // 获取连接等待时长
+        dataSource.setMaxWait(Integer.parseInt(jdbcMaxwait));
+        // 试探sql
+        dataSource.setValidationQuery(jdbcQuery);
+        // 默认开启, 设置一发
+        dataSource.setTestWhileIdle(true);
+        dataSource.setProxyFilters(Arrays.asList(creatFilter()));
+        return dataSource;
     }
 }
