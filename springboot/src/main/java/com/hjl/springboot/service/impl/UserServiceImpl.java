@@ -32,4 +32,12 @@ public class UserServiceImpl implements UserService {
     public List<User> findAll() {
         return userMapper.selectAll();
     }
+
+    @Override
+    public User selectByName(String name) {
+        User param = new User();
+        param.setName(name);
+        List<User> list = userMapper.select(param);
+        return list==null?null:list.get(0);
+    }
 }

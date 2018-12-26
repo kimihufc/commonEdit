@@ -13,4 +13,6 @@ public interface UserService {
     void save(String name,Integer age);
 
     List<User> findAll();
+
+    User selectByName(String name);
 }

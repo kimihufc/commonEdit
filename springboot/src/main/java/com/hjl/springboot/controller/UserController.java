@@ -41,5 +41,15 @@ public class UserController {
         return userService.findAll();
     }
 
+    /**
+     * 查询用户
+     *
+     * @param name
+     * @return
+     */
+    @RequestMapping(value = "find")
+    public User findByName(String name) {
+        return userService.selectByName(name);
+    }
 
 }
