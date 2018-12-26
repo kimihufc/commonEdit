@@ -4,6 +4,8 @@ import com.alibaba.druid.filter.stat.MergeStatFilter;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
+import com.hjl.springboot.aspect.MultiDataSource;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,8 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.sql.DataSource;
 import java.util.Arrays;
@@ -77,8 +81,50 @@ public class DruidConfiguration {
         return fiter;
     }
 
-    @Bean
-    public DataSource createDataSource(){
+//    @Bean
+//    public DataSource createDataSource(){
+//        DruidDataSource dataSource = new DruidDataSource();
+//        // mysql 驱动
+//        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+//        // url
+//        dataSource.setUrl(jdbcUrl);
+//        // 账号
+//        dataSource.setUsername(jdbcUser);
+//        // 密码
+//        dataSource.setPassword(jdbcPass);
+//        // 初始化连接
+//        dataSource.setInitialSize(Integer.parseInt(jdbcInitSizs));
+//        // 最大线程数
+//        dataSource.setMaxActive(Integer.parseInt(jdbcActive));
+//        // 空闲时, 最大保留连接数
+//        dataSource.setMinIdle(Integer.parseInt(jdbcMinidle));
+//        // 获取连接等待时长
+//        dataSource.setMaxWait(Integer.parseInt(jdbcMaxwait));
+//        // 试探sql
+//        dataSource.setValidationQuery(jdbcQuery);
+//        // 默认开启, 设置一发
+//        dataSource.setTestWhileIdle(true);
+//        dataSource.setProxyFilters(Arrays.asList(creatFilter()));
+//        return dataSource;
+//    }
+
+
+    @Bean(name = "dataSource")
+    public DataSource createMultiDataSource(){
+        MultiDataSource dataSource = new MultiDataSource();
+        Map<Object, Object> map = new HashMap<>();
+        map.put("one",createDataSourceOne());
+        map.put("two",createDataSourceTwo());
+        dataSource.setTargetDataSources(map);
+        return dataSource;
+    }
+    /**
+     * 配置多数据源（也可以理解为主从库查询）
+     * @return
+     */
+    @Bean(name = "one")
+    @Primary
+    public DruidDataSource createDataSourceOne(){
         DruidDataSource dataSource = new DruidDataSource();
         // mysql 驱动
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
@@ -102,5 +148,44 @@ public class DruidConfiguration {
         dataSource.setTestWhileIdle(true);
         dataSource.setProxyFilters(Arrays.asList(creatFilter()));
         return dataSource;
+    }
+    /**
+     * 配置多数据源（也可以理解为主从库查询）
+     * @return
+     */
+    @Bean(name = "two")
+    public DruidDataSource createDataSourceTwo(){
+        DruidDataSource dataSource = new DruidDataSource();
+        // mysql 驱动
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        // url
+        dataSource.setUrl(jdbcUrl);
+        // 账号
+        dataSource.setUsername(jdbcUser);
+        // 密码
+        dataSource.setPassword(jdbcPass);
+        // 初始化连接
+        dataSource.setInitialSize(Integer.parseInt(jdbcInitSizs));
+        // 最大线程数
+        dataSource.setMaxActive(Integer.parseInt(jdbcActive));
+        // 空闲时, 最大保留连接数
+        dataSource.setMinIdle(Integer.parseInt(jdbcMinidle));
+        // 获取连接等待时长
+        dataSource.setMaxWait(Integer.parseInt(jdbcMaxwait));
+        // 试探sql
+        dataSource.setValidationQuery(jdbcQuery);
+        // 默认开启, 设置一发
+        dataSource.setTestWhileIdle(true);
+        dataSource.setProxyFilters(Arrays.asList(creatFilter()));
+        return dataSource;
+    }
+
+    @Bean
+    public SqlSessionFactoryBean createSqlsessionFactory() throws Exception{
+        SqlSessionFactoryBean sqlFactory = new SqlSessionFactoryBean();
+        sqlFactory.setDataSource(createMultiDataSource());
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        sqlFactory.setMapperLocations(resolver.getResources("classpath:/mapper/*.xml"));
+        return sqlFactory;
     }
 }

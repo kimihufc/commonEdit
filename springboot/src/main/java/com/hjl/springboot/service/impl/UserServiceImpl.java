@@ -1,5 +1,6 @@
 package com.hjl.springboot.service.impl;
 
+import com.hjl.springboot.aspect.DBRoute;
 import com.hjl.springboot.dao.UserMapper;
 import com.hjl.springboot.domain.User;
 import com.hjl.springboot.service.UserService;
@@ -29,11 +30,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @DBRoute(name = "one")
     public List<User> findAll() {
         return userMapper.selectAll();
     }
 
     @Override
+    @DBRoute(name = "three")
     public User selectByName(String name) {
         User param = new User();
         param.setName(name);
