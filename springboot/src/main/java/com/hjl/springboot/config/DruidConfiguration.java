@@ -52,7 +52,7 @@ public class DruidConfiguration {
     @Bean
     public MergeStatFilter creatFilter(){
         MergeStatFilter fiter = new MergeStatFilter();
-        fiter.setSlowSqlMillis(100L);
+        fiter.setSlowSqlMillis(10L);
         fiter.setLogSlowSql(true);
         return fiter;
     }
