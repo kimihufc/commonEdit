@@ -1,5 +1,6 @@
 package com.hjl.springboot.controller;
 
+import com.hjl.springboot.config.RabbitGateway;
 import com.hjl.springboot.config.RedisAccess;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -25,6 +26,9 @@ public class HelloController {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RabbitGateway rabbitGateway;
 
     @GetMapping("hello")
     public String hello() {
@@ -52,6 +56,11 @@ public class HelloController {
     public String rabbitmq(){
       rabbitTemplate.send("user_queue", new Message("123".getBytes(),new MessageProperties()));
         return "";
+    }
+    @RequestMapping("rabbitmqgateway")
+    public String rabbitmqgateway(){
+        rabbitGateway.send("user_queue", new Message("123".getBytes(),new MessageProperties()));
+        return "success";
     }
 
 }
